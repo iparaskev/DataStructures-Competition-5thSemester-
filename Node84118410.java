@@ -15,6 +15,8 @@ public class Node84118410
 	int[] nodeMove;
 	Board nodeBoard;
 	double nodeEvaluation;
+	double a; //maximizer worst case 
+	double b; //minimizer worst case
 	
 	//constructor
 	public Node84118410(Node84118410 par, ArrayList<Node84118410> child, int depth,int[] move,Board boardM){
@@ -23,6 +25,8 @@ public class Node84118410
 		nodeDepth = depth;
 		nodeMove = move;
 		nodeBoard = boardM;
+		a = par.getA(); //child get parents ab
+		b = par.getB(); 
 		nodeEvaluation= moveEvaluation(nodeMove, nodeBoard);
 	}
 	
@@ -30,6 +34,9 @@ public class Node84118410
 		children=new ArrayList<Node84118410>();
 		nodeDepth=0;			
 		nodeEvaluation=0;
+		a=Integer.MIN_VALUE; //value for a
+		b=Integer.MAX_VALUE; //value for b
+		
 	}
 	
 	public Node84118410(Board board, Node84118410 par , int[] m , int d){
@@ -38,6 +45,8 @@ public class Node84118410
 		nodeDepth = d ;
 		nodeMove = m;
 		children = new ArrayList<Node84118410>();
+		a = par.getA(); //child get parents ab
+		b = par.getB(); 
 		nodeEvaluation= moveEvaluation(nodeMove, nodeBoard);
 	}
 	
@@ -66,6 +75,13 @@ public class Node84118410
 		nodeEvaluation=eval;
 	}
 	
+	public void setA(double alpha){
+		a = alpha ;
+	}
+	
+	public void setB(double beta){
+		b = beta ;
+	}
 	//getters
 	public Node84118410 getParent(){
 		return parent;
@@ -91,7 +107,14 @@ public class Node84118410
 		return nodeEvaluation;
 	}
 	
-	//evaluation
+	public double getA(){
+		return a;
+	}
+	
+	public double getB(){
+		return b;
+	}
+
 	
 	//υπολογίζει την αξιολόγηση της κάθε κίνησης	
 	double moveEvaluation (int[] move, Board board2)
@@ -121,22 +144,22 @@ public class Node84118410
 			  int points[] = evaluationPoints(hor,ver,x,y,color,board2);//πίνακας ακεραίων με τους πόντους,τον αριθμό των πλακιδιών που κουνιούνται
                                                                         //και τον προσανατολισμό της διαγραφής	   
 			  int chain = checkForChain( board2);//οι πόντοι από την αλυσιδωτή κίνηση αν υπάρχει 
-			  int proxy[] = sameColorInProximity(3, 3, board2, x, y); //ο πίνακας με τον αριθμό των πλακιδιών που έχουν ίδιο χρώμα μεταξύ τους
-			  int min = 1;
-			  for(int k=0;k<proxy.length;k++){
-				  if(proxy[k]>2 && k!=color){
-					  min=0;
-				  }
-			  }
+			  //int proxy[] = sameColorInProximity(3, 3, board2, x, y); //ο πίνακας με τον αριθμό των πλακιδιών που έχουν ίδιο χρώμα μεταξύ τους
+			  //int min = 1;
+			  //for(int k=0;k<proxy.length;k++){
+			//	  if(proxy[k]>2 && k!=color){
+				//	  min=0;
+				  //}
+			 // }
 			  int pointsTotal = points[0]+chain; //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης
-			  if(pointsTotal > 5){
-				  evaluation = 80 + pointsTotal*0.2  + points[2] + min + points[1]/10;
-			  }
-			  else{
-				  evaluation = (pointsTotal*points[1])/100 + (points[2]+min);
-			  }
+			  //if(pointsTotal > 5){
+			//	  evaluation = 80 + pointsTotal*0.2  + points[2] + min + points[1]/10;
+			  //}
+			  //else{
+				//  evaluation = (pointsTotal*points[1])/100 + (points[2]+min);
+			  //}
 			
-			  return evaluation;
+			  return pointsTotal;
 			  
 
 		}
