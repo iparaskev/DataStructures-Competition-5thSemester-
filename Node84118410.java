@@ -17,6 +17,7 @@ public class Node84118410
 	double nodeEvaluation;
 	double a; //maximizer worst case 
 	double b; //minimizer worst case
+	int nOfChain=1; //αριθμος των chain moves
 	
 	//constructor
 	public Node84118410(Node84118410 par, ArrayList<Node84118410> child, int depth,int[] move,Board boardM){
@@ -119,49 +120,43 @@ public class Node84118410
 	//υπολογίζει την αξιολόγηση της κάθε κίνησης	
 	double moveEvaluation (int[] move, Board board2)
 	{
-			  
-		double evaluation=0;
-			  
-			  int x=move[0],y=move[1] ; //οι συντεταγμένες του πλακιδίου μετά την κίνηση
-			  switch (move[2]){
-			  case CrushUtilities.LEFT : x=move[0]-1;
-			  		  break;
-			  case CrushUtilities.DOWN :
-			  		  y = move[1]-1;
-			  		  break;
-			  case CrushUtilities.RIGHT :x = move[0]+1;
-			  		  break;
-			  case CrushUtilities.UP :
-			  		  y = move[1]+1;
-			  		 break;
-			  }
-			  
-			  int color=board2.giveTileAt(x,y).getColor(); //το χρώμα του πλακιδίου που θα μετακινηθεί
-			  
-			  int ver = sameUp(x,y,color,board2) + sameDown(x, y, color,board2) +1; //το σύνολο των όμοιων πλακιδίως κάθετα
-			  int hor = sameLeft(x,y,color,board2) + sameRight(x,y,color,board2	) +1;  //το σύνολο των όμοιων πλακιδίων οριζόντια
-			  	
-			  int points[] = evaluationPoints(hor,ver,x,y,color,board2);//πίνακας ακεραίων με τους πόντους,τον αριθμό των πλακιδιών που κουνιούνται
-                                                                        //και τον προσανατολισμό της διαγραφής	   
-			  int chain = checkForChain( board2);//οι πόντοι από την αλυσιδωτή κίνηση αν υπάρχει 
-			  //int proxy[] = sameColorInProximity(3, 3, board2, x, y); //ο πίνακας με τον αριθμό των πλακιδιών που έχουν ίδιο χρώμα μεταξύ τους
-			  //int min = 1;
-			  //for(int k=0;k<proxy.length;k++){
-			//	  if(proxy[k]>2 && k!=color){
-				//	  min=0;
-				  //}
-			 // }
-			  int pointsTotal = points[0]+chain; //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης
-			  //if(pointsTotal > 5){
-			//	  evaluation = 80 + pointsTotal*0.2  + points[2] + min + points[1]/10;
-			  //}
-			  //else{
-				//  evaluation = (pointsTotal*points[1])/100 + (points[2]+min);
-			  //}
-			
-			  return pointsTotal;
-			  
-
+		int points=0;
+		 int x=move[0],y=move[1] ; //οι συντεταγμένες του πλακιδίου
+		  switch (move[2]){
+		  case CrushUtilities.LEFT : x=move[0]-1;
+		  		  break;
+		  case CrushUtilities.DOWN :
+		  		  y = move[1]-1;
+		  		  break;
+		  case CrushUtilities.RIGHT :x = move[0]+1;
+		  		  break;
+		  case CrushUtilities.UP :
+		  		  y = move[1]+1;
+		  		 break;
+		  }
+		  
+		  int color=board2.giveTileAt(x,y).getColor(); //το χρώμα του πλακιδίου που μετακινηθηκε 
+		  
+		  int ver = sameUp(x,y,color,board2) + sameDown(x, y, color,board2) +1; //το σύνολο των όμοιων πλακιδίως κάθετα
+		  int hor = sameLeft(x,y,color,board2) + sameRight(x,y,color,board2	) +1;  //το σύνολο των όμοιων πλακιδίως οριζόντια
+		  
+		  if(hor<3){
+			  points=ver;
+		  }
+		  else if(ver<3){
+			  points=hor;
+		  }
+		  else if((ver>2) && (hor>2)){
+			  points=ver + hor - 1; 
+		  }
+		                                            	  
+		  int chain = checkForChain(board2); //οι πόντοι από την αλυσιδωτή κίνηση αν υπάρχει 
+		  nOfChain=1;
+		  double pointsTotal = points+chain; //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης
+		
+		  if(points==5) pointsTotal=1000;
+		  
+		  return pointsTotal;
 		}
 
 	    //επιστρέφει τον αριθμό των πλακιδίων ίδου χρώματος αριστερά από το πλακίδιο της κίνησης
@@ -204,89 +199,11 @@ public class Node84118410
 			  }
 			  return 0;
 		}
-		//επιστρέφει τον αριθμό των πλακιδίων που θα διαγραφούν,που θα μετακινηθούν και τον προσανατολισμό της διαγραφής 
-		int[] evaluationPoints(int hor,int ver,int x,int y,int color, Board board){
-			  int belongs = 0; //ο αριθμός των πλακιδιών που θα διαγραφούν 
-			  int moving = 0; //ο αριθμός των πλακιδιών που θα κουνηθούν 
-			  int orientation = 0;//προσανατολισμός της διαγραφής ,0 κάθετη, 1 οριζόντια και 3 και τα δύο
-			    
-			  //κάθετη κίνηση
-			  if(hor<3){
-				  belongs=ver ;
-				  moving=10-(y-(sameDown(x,y,color,board)) );  //10-κατώτερο σημείο 
-				  orientation = 1;
-			  }
-			  
-			  //ïñéæüíôéá êßíçóç
-			  else if(ver<3){
-				  
-				  belongs=hor;
-				  moving=hor*(CrushUtilities.NUMBER_OF_PLAYABLE_ROWS-y) ; //οριζόντια*(απόσταση από κορυφή) 
-				  orientation = 2;
-				 
-			  }
-			  
-			  //οριζόντια και κάθετη 
-			  else if((ver>2) && (hor>2)){
-				  belongs=ver + hor - 1; 
-				  moving=hor*(10-y) + sameDown(x,y,color,board) ;
-				  orientation= 3;
-			  }
-			  int[] points = {belongs , moving , orientation};
-			  return points;
-			  
-		}
-
-		//ο αριθμός των πλακιδιών που έχουν ίδιο χρώμα μεταξύ τους στο τετράγωνο width*height 
-		int[] sameColorInProximity(int width,int height,Board board,int x,int y){
-			  int[] send = new int[7]; // o πίνακας που επιστρέφεται 
-			  //τα όρια της αναζήτησης
-			  int sx=x-width/2;
-			  int fx=x+width/2+1;
-			  int sy=y-height/2;
-			  int fy=y+height/2+1;
-			  if(sx < 0){
-				 sx=0;
-			  }
-			  if(x+width/2 > 9){
-				 fx=board.getCols();
-			  }
-			  if(sy < 0){
-				  sy=0;
-			  }
-			  if(y+height/2 > 9){
-				  fy=10;
-			  }
-			  //η αναζήτηση
-			  for(int i=sx ; i<fx ; i++){
-				  for(int j=sy ; j<fy ; j++){
-					  int color=board.giveTileAt(i,j).getColor();
-					  switch(color){
-					  case CrushUtilities.RED : send[0]++;
-					  							break;
-					  case CrushUtilities.GREEN : send[1]++;
-					  							  break;
-					  case CrushUtilities.BLUE : send[2]++;
-												 break;
-					  case CrushUtilities.YELLOW : send[3]++;
-												   break;
-					  case CrushUtilities.BLACK : send[4]++;
-												  break;
-					  case CrushUtilities.PURPLE : send[5]++;
-												   break;
-					  case CrushUtilities.CYAN : send[6]++;
-												 break;
-					  }
-				  }
-			  }
-			  return send;
-		}
-
-
-
+	
 		//ελέγχει αν υπάρχουν chainmoves μετά την κίνηση μας,δέχεται ως όρισμα μία μεταβλητή τύπου Board
 		//και επιστρέφει έναν ακέραιο
 		int checkForChain(Board boardAfterMov){
+			nOfChain+=0,5;
 			int chainCounter=0; //οι συνολικοί πόντοι αλυσίδας
 			int newHor=0; // αποθηκεύει τα νέα κάθετα
 			int newVer=0; // αποθηκεύει τα νέα οριζόντια
@@ -402,12 +319,10 @@ public class Node84118410
 			}
 		    
 			if(chainCounter>0){
-				return chainCounter+=checkForChain(boardAfterCr);
+				return chainCounter= (int)(chainCounter*nOfChain) + checkForChain(boardAfterCr);
 			}
-			else return chainCounter;
-			
+			else return chainCounter;			
 		}
-
 
 		//fill the arraylist πινακας με χ,υ και χρωμα για να αποφευγω διπλά 
 		int [] fillTheList(int x,int y,int sameUp,int color){
