@@ -136,9 +136,13 @@ public class Node84118410
 		  }
 		  
 		  int color=board2.giveTileAt(x,y).getColor(); //το χρώμα του πλακιδίου που μετακινηθηκε 
+		  int color2=board2.giveTileAt(move[0], move[1]).getColor(); // το χρωμα του αλλου πλακιδιου που μετακινηθηκε
 		  
 		  int ver = sameUp(x,y,color,board2) + sameDown(x, y, color,board2) +1; //το σύνολο των όμοιων πλακιδίως κάθετα
 		  int hor = sameLeft(x,y,color,board2) + sameRight(x,y,color,board2	) +1;  //το σύνολο των όμοιων πλακιδίως οριζόντια
+		
+		  int ver2 = sameUp(move[0],move[1],color2,board2) + sameDown(move[0],move[1],color2,board2) +1;
+		  int hor2 = sameLeft(move[0],move[1],color2,board2) + sameRight(move[0],move[1],color2,board2) +1;
 		  
 		  if(hor<3){
 			  points=ver;
@@ -149,10 +153,20 @@ public class Node84118410
 		  else if((ver>2) && (hor>2)){
 			  points=ver + hor - 1; 
 		  }
+		
+		  if(hor2>2 && ver2<3){
+			  points+=hor2;
+		  }
+		  else if(ver2>2 && ver2<3){
+			  points+=ver2;
+		  }
+		  else if(ver2>2 && hor2>2){
+			  points+=ver2+hor2-1;
+		  }
 		                                            	  
 		  double chain = checkForChain(board2) +0.5; //οι πόντοι από την αλυσιδωτή κίνηση αν υπάρχει και 0.5 γιατι τα 0.5 -> 1 στο σκορ
 		  nOfChain=1;
-		  double pointsTotal = (int)(points+chain); //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης (τι θα δειξει το σκορ)
+		  pointsTotal = (int)(points+chain); //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης (τι θα δειξει το σκορ)
 		
 		  if(points==5){
 			  pointsTotal=1000;
