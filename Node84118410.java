@@ -17,7 +17,7 @@ public class Node84118410
 	double nodeEvaluation;
 	double a; //maximizer worst case 
 	double b; //minimizer worst case
-	int nOfChain=1; //αριθμος των chain moves
+	double nOfChain=1; //αριθμος των chain moves
 	
 	//constructor
 	public Node84118410(Node84118410 par, ArrayList<Node84118410> child, int depth,int[] move,Board boardM){
@@ -150,11 +150,13 @@ public class Node84118410
 			  points=ver + hor - 1; 
 		  }
 		                                            	  
-		  int chain = checkForChain(board2); //οι πόντοι από την αλυσιδωτή κίνηση αν υπάρχει 
+		  double chain = checkForChain(board2) +0.5; //οι πόντοι από την αλυσιδωτή κίνηση αν υπάρχει και 0.5 γιατι τα 0.5 -> 1 στο σκορ
 		  nOfChain=1;
-		  double pointsTotal = points+chain; //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης
+		  double pointsTotal = (int)(points+chain); //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης (τι θα δειξει το σκορ)
 		
-		  if(points==5) pointsTotal=1000;
+		  if(points==5){
+			  pointsTotal=1000;
+		  }
 		  
 		  return pointsTotal;
 		}
@@ -202,9 +204,9 @@ public class Node84118410
 	
 		//ελέγχει αν υπάρχουν chainmoves μετά την κίνηση μας,δέχεται ως όρισμα μία μεταβλητή τύπου Board
 		//και επιστρέφει έναν ακέραιο
-		int checkForChain(Board boardAfterMov){
+		double checkForChain(Board boardAfterMov){
 			nOfChain+=0,5;
-			int chainCounter=0; //οι συνολικοί πόντοι αλυσίδας
+			double chainCounter=0; //οι συνολικοί πόντοι αλυσίδας
 			int newHor=0; // αποθηκεύει τα νέα κάθετα
 			int newVer=0; // αποθηκεύει τα νέα οριζόντια
 			int newColor=-1;
@@ -319,7 +321,7 @@ public class Node84118410
 			}
 		    
 			if(chainCounter>0){
-				return chainCounter= (int)(chainCounter*nOfChain) + checkForChain(boardAfterCr);
+				return chainCounter= chainCounter*nOfChain + checkForChain(boardAfterCr);
 			}
 			else return chainCounter;			
 		}
