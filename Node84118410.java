@@ -166,7 +166,7 @@ public class Node84118410
 		                                            	  
 		  double chain = checkForChain(board2) +0.5; //οι πόντοι από την αλυσιδωτή κίνηση αν υπάρχει και 0.5 γιατι τα 0.5 -> 1 στο σκορ
 		  nOfChain=1;
-		  pointsTotal = (int)(points+chain); //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης (τι θα δειξει το σκορ)
+		  double pointsTotal = (int)(points+chain); //οι συνολικοί πόντοι μαζί με αυτούς της αλυσιδοτής κίνησης (τι θα δειξει το σκορ)
 		
 		  if(points==5){
 			  pointsTotal=1000;
