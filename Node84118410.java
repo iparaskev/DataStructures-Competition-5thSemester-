@@ -236,7 +236,7 @@ public class Node84118410
 		//ελέγχει αν υπάρχουν chainmoves μετά την κίνηση μας,δέχεται ως όρισμα μία μεταβλητή τύπου Board
 		//και επιστρέφει έναν ακέραιο
 		double checkForChain(Board boardAfterMov){
-			nOfChain+=0,5;
+			nOfChain+=0.5;
 			double chainCounter=0; //οι συνολικοί πόντοι αλυσίδας
 			int newHor=0; // αποθηκεύει τα νέα κάθετα
 			int newVer=0; // αποθηκεύει τα νέα οριζόντια
