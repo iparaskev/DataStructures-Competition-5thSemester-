@@ -100,16 +100,20 @@ public class Player84118410 implements AbstractPlayer
 	    	child.setEvaluation(eval);  
 	    	parent.setChildren(child); //ορίζουμε σαν παιδί του πρώτου πίνακα τον κάθε κόμβο
 	    	
-	    	if(child.bonus && depth<5){ //αν υπαρχει 5αδα και ειμαστε κατω απο 5 επιπεδα καλει τον εαυτο της
+	    	if(child.bonus && depth<3){ //αν υπαρχει 5αδα και ειμαστε κατω απο 4 επιπεδα καλει τον εαυτο της
 	    		createMySubTree(child,depth+1);
 	    	}
 	    	
-	    	if(depth<5){ // αν ειμαστε κατω απο 5 καλει για τον αντιπαλο, αλλιως σταματαμε εδω
-	    		createOpponentSubTree(child, depth+1); //καλούμε την συνάρτηση που δημιουργει το υποδέντρο για τις κινησεις του αντιπαλου
-	    	}
-	    	else{
-	    		//κατι για το aβ
-	    	}
+	    	createOpponentSubTree(child, depth+1); //καλούμε την συνάρτηση που δημιουργει το υποδέντρο για τις κινησεις του αντιπαλου
+	    	
+	    	 if(parent.bonus){
+	              if(child.getB()> parent.getB()) parent.setB(child.getB());
+	         }
+	         else{
+	        	 if(child.getB() > parent.getA()){
+	                  parent.setA(child.getB());
+	             }
+	         }        
 	    	
     	    if(child.getB() > parent.getA()){
     	    	parent.setA(child.getB());
@@ -141,16 +145,28 @@ public class Player84118410 implements AbstractPlayer
     	    	child.setOriginalBoard(board); //πινακας πριν την κινηση
         		parent.setChildren(child);//ορίζουμε κάθε κίνηση του αντιπάλου σαν παιδί της αντίστοιχης δική μας κίνησης 	
         		
-        		if(child.bonus && depth<5){	//αν υπαρχει 5αδα και ειμαστε πανω απο το 5ο επιπεδο καλει τον εαυτο της
+        		if(child.bonus && depth<3){	//αν υπαρχει 5αδα και ειμαστε πανω απο το 4ο επιπεδο καλει τον εαυτο της
             		createOpponentNextSubTree(child, depth+1);
         		}
         		
-        		if(depth<5){	//καλει μονο οταν ειμαστε πανω απο τα 5
-            		createMyNextSubTree(child,depth+1); //call opp next sub tree
+        		if(depth<4){
+        			createMyNextSubTree(child,depth+1); //call opp next sub tree
         		}
         		else{
-        			//κατι με αβ
+        			child.setA(eval);
         		}
+        		
+        		if(parent.bonus){
+                     if(child.getA() < parent.getA()) parent.setA(child.getA());
+                 }
+                 else{
+                     //set b for depth 2
+                     if(child.getA() < parent.getB()){
+                         parent.setB(child.getA());
+                     }
+                 }   
+            	
+
         		//set b for depth 2
         		if(child.getA() < parent.getB()){
         			parent.setB(child.getA());
@@ -178,16 +194,7 @@ public class Player84118410 implements AbstractPlayer
               child.setOriginalBoard(myBoard);
               parent.setChildren(child);
               
-              if(child.bonus && depth<5){
-            	  createMyNextSubTree(child, depth+1);
-              }
-              
-              if(depth<5){
-            	  createOpponentNextSubTree(child,depth + 1);
-              }
-              else{
-            	  //κατι με αβ
-              }
+              createOpponentNextSubTree(child,depth + 1);
               
               //set a for maximizer at depth 3
               if(child.getB() > parent.getA() ){
@@ -219,10 +226,7 @@ public class Player84118410 implements AbstractPlayer
               double eval = parent.getEvaluation() - child.getEvaluation(); // score after move;
               child.setEvaluation(eval);
               child.setOriginalBoard(last);
-              
-              if(child.bonus && depth<5){ //στην συναρτηση μπαινει με depth=4ή5 αν ειναι 4 την ξανακαλει αλλιως σταματαει
-            	  createOpponentNextSubTree(child, depth+1);
-              }
+            
               //set a for node
               child.setA(eval);
               //set b for minimizer
@@ -247,8 +251,6 @@ public class Player84118410 implements AbstractPlayer
     και επιστρέφει έναν ακέραιο που μας δίνει την θέση της κίνησης */
   private int chooseMove (Node84118410 root)
   {
-
-      //TODO Fill the code
 	  ArrayList<Node84118410> myMoves=root.getChildren();  //μία λίστα που έχει ως περιεχόμενο τους κόμβους με τις κινήσεις μας
       double max=-500;
       int pos=-1;
