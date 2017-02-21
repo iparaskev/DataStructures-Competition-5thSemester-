@@ -14,10 +14,12 @@ public class Node84118410
 	int nodeDepth;
 	int[] nodeMove;
 	Board nodeBoard;
+	Board originalBoard;
 	double nodeEvaluation;
 	double a; //maximizer worst case 
 	double b; //minimizer worst case
 	double nOfChain=1; //αριθμος των chain moves
+	boolean bonus;
 	
 	//constructor
 	public Node84118410(Node84118410 par, ArrayList<Node84118410> child, int depth,int[] move,Board boardM){
@@ -83,6 +85,11 @@ public class Node84118410
 	public void setB(double beta){
 		b = beta ;
 	}
+	
+	public void setOriginalBoard(Board o){
+		originalBoard = o;
+	}
+	
 	//getters
 	public Node84118410 getParent(){
 		return parent;
@@ -115,11 +122,16 @@ public class Node84118410
 	public double getB(){
 		return b;
 	}
+	
+	public Board getOriginalBoard(){
+		return originalBoard;
+	}
 
 	
 	//υπολογίζει την αξιολόγηση της κάθε κίνησης	
 	double moveEvaluation (int[] move, Board board2)
 	{
+		bonus=false;
 		int points=0;
 		 int x=move[0],y=move[1] ; //οι συντεταγμένες του πλακιδίου
 		  switch (move[2]){
@@ -154,6 +166,11 @@ public class Node84118410
 			  points=ver + hor - 1; 
 		  }
 		
+		  if(points==5){	//αν διαγραφει 5αδα απο την κινηση βαζουμε το bonus true
+			  bonus = true;
+		  }
+		
+		  //ελεγχος για το αλλο πλακιδιο που μετακινηθηκε αν δημιουργει ποντους
 		  if(hor2>2 && ver2<3){
 			  points+=hor2;
 		  }
