@@ -79,27 +79,43 @@ public class Player84118410 implements AbstractPlayer
     έναν ακέραιο που δείχνει το βάθος που βρίσκεται ,δεν επιστρέφει κάτι*/ 
     private void createMySubTree (Node84118410 parent, int depth)
   {
-    // TODO Fill the code
 	    Board pBoard = parent.getBoard();  
+	    if(depth>1){ //αν εχει μπει σε κινηση μετα την 1η
+	    	pBoard = CrushUtilities.boardAfterFullMove(parent.getOriginalBoard(), parent.getMove());
+	    }
 	    ArrayList<int[]> avMoves = CrushUtilities.getAvailableMoves(pBoard); //στην μεταβλητή avMoves αποθηκέυουμε τις διαθέσιμες κινήσεις  
 	                                                                         //του παίκτη μας 
 	    for(int i=0;i<avMoves.size();i++){
 	    	
 	    	int[] move = avMoves.get(i);    //η κάθε διαθέσιμη κίνηση 
 	    	Board chBoard = CrushUtilities.boardAfterFirstMove(pBoard, move); //ο πίνακας μετά την κίνηση   
-	    	
 	    	Node84118410 child = new Node84118410(chBoard , parent , move , depth); //δημιουργούμε τον κάθε νέο κόμβο που αντιτοιχεί σε κάθε κίνηση
-	    	double eval = child.getEvaluation();	
-	    	child.setEvaluation(eval);  
+	    	child.setOriginalBoard(pBoard);  // πινακας πριν την κινηση
+	    	double eval = child.getEvaluation();
 	    	
-	    	parent.setChildren(child); //ορίζουμε σαν παιδί του πρώτου πίνακα τον κάθε κόμβο	
-	    	createOpponentSubTree(child, depth+1); //καλούμε την συνάρτηση που δημιουργει το υποδέντρο για τις κ
-    	        if(child.getB() > parent.getA()){
-    	    		parent.setA(child.getB());
-    	    	}      
+	    	if(depth>1){ //αν μπηκε σε επομενη κινηση επειδη την καει δικια μας κινηση θα ειναι αθροισμα
+	    		eval+=parent.getEvaluation();
+	    	}
+	    	
+	    	child.setEvaluation(eval);  
+	    	parent.setChildren(child); //ορίζουμε σαν παιδί του πρώτου πίνακα τον κάθε κόμβο
+	    	
+	    	if(child.bonus && depth<5){ //αν υπαρχει 5αδα και ειμαστε κατω απο 5 επιπεδα καλει τον εαυτο της
+	    		createMySubTree(child,depth+1);
+	    	}
+	    	
+	    	if(depth<5){ // αν ειμαστε κατω απο 5 καλει για τον αντιπαλο, αλλιως σταματαμε εδω
+	    		createOpponentSubTree(child, depth+1); //καλούμε την συνάρτηση που δημιουργει το υποδέντρο για τις κινησεις του αντιπαλου
+	    	}
+	    	else{
+	    		//κατι για το aβ
+	    	}
+	    	
+    	    if(child.getB() > parent.getA()){
+    	    	parent.setA(child.getB());
+    	   	}      
 	    }
   }
-  
   
   
   /* η συνάρτηση createOpponentSubTree δημιουργεί το υποδέντρο που έχει ως κόμβους τις κινήσεις του αντιπάλου
@@ -107,8 +123,7 @@ public class Player84118410 implements AbstractPlayer
   έναν ακέραιο που δείχνει το βάθος που βρίσκεται ,δεν επιστρέφει κάτι*/ 
   private void createOpponentSubTree (Node84118410 parent, int depth)
   {
-    // TODO Fill the code
-	    Board board = CrushUtilities.boardAfterFullMove(parent.getParent().getBoard(), parent.getMove()); 	
+	    Board board = CrushUtilities.boardAfterFullMove(parent.getOriginalBoard(), parent.getMove()); 	
 	    ArrayList<int[]> moves = CrushUtilities.getAvailableMoves(board);	//οι διαθέσιμες κινήσεις του αντιπάλου
 	    
 	    for(int i=0;i<moves.size();i++){
@@ -119,12 +134,23 @@ public class Player84118410 implements AbstractPlayer
     		}
     		else{
     			int move[] = moves.get(i);	//η κάθε κίνηση
-    	    		Board boardOfNode = CrushUtilities.boardAfterFirstMove(board, move);	// ο πίνακας μετά την κίνηση
+    	    	Board boardOfNode = CrushUtilities.boardAfterFirstMove(board, move);	// ο πίνακας μετά την κίνηση
         		Node84118410 child = new Node84118410(boardOfNode , parent , move , depth);  	//ο κόμβος της κάθε κίνησης
-    	    		double eval = parent.getEvaluation()-child.getEvaluation(); //adjustments
-    	    		child.setEvaluation(eval);   //set evaluation for opps
+    	    	double eval = parent.getEvaluation()-child.getEvaluation(); //adjustments
+    	    	child.setEvaluation(eval);   //set evaluation for opps
+    	    	child.setOriginalBoard(board); //πινακας πριν την κινηση
         		parent.setChildren(child);//ορίζουμε κάθε κίνηση του αντιπάλου σαν παιδί της αντίστοιχης δική μας κίνησης 	
-        		createMyNextSubTree(child,depth+1); //call opp next sub tree
+        		
+        		if(child.bonus && depth<5){	//αν υπαρχει 5αδα και ειμαστε πανω απο το 5ο επιπεδο καλει τον εαυτο της
+            		createOpponentNextSubTree(child, depth+1);
+        		}
+        		
+        		if(depth<5){	//καλει μονο οταν ειμαστε πανω απο τα 5
+            		createMyNextSubTree(child,depth+1); //call opp next sub tree
+        		}
+        		else{
+        			//κατι με αβ
+        		}
         		//set b for depth 2
         		if(child.getA() < parent.getB()){
         			parent.setB(child.getA());
@@ -135,8 +161,7 @@ public class Player84118410 implements AbstractPlayer
   //create my player's next sub tree
   private void createMyNextSubTree(Node84118410 parent,int depth){
      
-      Board middle = CrushUtilities.boardAfterFullMove(parent.getParent().getParent().getBoard(), parent.getParent().getMove()); //o pinakas prin tin kinish tou antipalou
-      Board myBoard = CrushUtilities.boardAfterFullMove(middle, parent.getMove());  //o pinakas meta tin kinisi toy antipalou
+      Board myBoard = CrushUtilities.boardAfterFullMove(parent.getOriginalBoard(), parent.getMove());  //o pinakas meta tin kinisi toy antipalou
       ArrayList<int []> posMoves=CrushUtilities.getAvailableMoves(myBoard); //possible moves
      
       for(int i=0; i< posMoves.size();i++){
@@ -150,8 +175,20 @@ public class Player84118410 implements AbstractPlayer
               Node84118410 child = new Node84118410(nodeBoard, parent, move, depth);
               double eval = child.getEvaluation() + parent.getEvaluation(); // score after move;
               child.setEvaluation(eval);
+              child.setOriginalBoard(myBoard);
               parent.setChildren(child);
-              createOpponentNextSubTree(child,depth + 1);
+              
+              if(child.bonus && depth<5){
+            	  createMyNextSubTree(child, depth+1);
+              }
+              
+              if(depth<5){
+            	  createOpponentNextSubTree(child,depth + 1);
+              }
+              else{
+            	  //κατι με αβ
+              }
+              
               //set a for maximizer at depth 3
               if(child.getB() > parent.getA() ){
     			  parent.setA(child.getB());
@@ -168,9 +205,7 @@ public class Player84118410 implements AbstractPlayer
   //create opps next sub tree
   private void createOpponentNextSubTree(Node84118410 parent,int depth){
      
-      Board middle = CrushUtilities.boardAfterFullMove(parent.getParent().getParent().getParent().getBoard(),parent.getParent().getParent().getMove() ); //o pinakas pou vlepei o antipalos arxika
-      Board secMidlle = CrushUtilities.boardAfterFullMove(middle, parent.getParent().getMove()); //board before my second move
-      Board last = CrushUtilities.boardAfterFullMove(secMidlle, parent.getMove()); // final board
+      Board last = CrushUtilities.boardAfterFullMove(parent.getOriginalBoard(), parent.getMove()); // final board
       ArrayList<int []> posMoves = CrushUtilities.getAvailableMoves(last); //possible moves
       for(int i=0 ; i < posMoves.size();i++){
     	  //prune for minimizer
@@ -183,6 +218,11 @@ public class Player84118410 implements AbstractPlayer
               Node84118410 child = new Node84118410(nodeBoard, parent, move, depth);
               double eval = parent.getEvaluation() - child.getEvaluation(); // score after move;
               child.setEvaluation(eval);
+              child.setOriginalBoard(last);
+              
+              if(child.bonus && depth<5){ //στην συναρτηση μπαινει με depth=4ή5 αν ειναι 4 την ξανακαλει αλλιως σταματαει
+            	  createOpponentNextSubTree(child, depth+1);
+              }
               //set a for node
               child.setA(eval);
               //set b for minimizer
@@ -199,6 +239,7 @@ public class Player84118410 implements AbstractPlayer
           }
       }
   }
+  
   
   
   /*η συνάρτηση chooseMove ελέγχει ποια κίνηση μας συμφέρει περισσότερο
