@@ -141,6 +141,10 @@ public class Player84118410 implements AbstractPlayer
     	    	Board boardOfNode = CrushUtilities.boardAfterFirstMove(board, move);	// ο πίνακας μετά την κίνηση
         		Node84118410 child = new Node84118410(boardOfNode , parent , move , depth);  	//ο κόμβος της κάθε κίνησης
     	    	double eval = parent.getEvaluation()-child.getEvaluation(); //adjustments
+    	    	//if oppenent's score becomes more than 500 
+    	    	if((child.getEvaluation() + CrushUtilities.getOpponentsScore(id)) >= 500){
+              	  parent.setB(Double.MIN_VALUE);
+                }
     	    	child.setEvaluation(eval);   //set evaluation for opps
     	    	child.setOriginalBoard(board); //πινακας πριν την κινηση
         		parent.setChildren(child);//ορίζουμε κάθε κίνηση του αντιπάλου σαν παιδί της αντίστοιχης δική μας κίνησης 	
@@ -224,6 +228,10 @@ public class Player84118410 implements AbstractPlayer
               Board nodeBoard = CrushUtilities.boardAfterFirstMove(last, move); // o pinakas meta thn kinish
               Node84118410 child = new Node84118410(nodeBoard, parent, move, depth);
               double eval = parent.getEvaluation() - child.getEvaluation(); // score after move;
+              //if oppenent's score becomes more than 500 
+              if((child.getEvaluation() + CrushUtilities.getOpponentsScore(id)) >= 500){
+            	  parent.setB(Double.MIN_VALUE);
+              }
               child.setEvaluation(eval);
               child.setOriginalBoard(last);
             
