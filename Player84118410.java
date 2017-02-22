@@ -271,4 +271,48 @@ public class Player84118410 implements AbstractPlayer
       return pos;
 	 
   }
+  private void reArrangeTree(Node84118410 root){
+	  ArrayList<Node84118410> listNodes= new ArrayList<Node84118410>();
+	  ArrayList<Node84118410> myMoves= root.getChildren();
+	  for(int i=0; i< myMoves.size();i++){
+		  ArrayList<Node84118410> oppsMoves=myMoves.get(i).getChildren();
+		  
+		  for(int j=0;j<oppsMoves.size();j++){
+			  
+		  }
+	  }
+  }
+  
+  private ArrayList<Node84118410> quicksort(ArrayList<Node84118410> child,int low,int high){
+	  int pivot;
+	  if(high > low){
+		  pivot= partition(child,low,high);
+		  quicksort(child,low,pivot-1);
+		  quicksort(child,pivot+1,high);
+		  
+	  }
+	  return child;
+  }
+  
+  private int partition(ArrayList<Node84118410> child,int low,int high){
+	  int left,right;
+	  double pivot_item= child.get(low).getEvaluation();
+	  Node84118410 piv=child.get(low);
+	  left= low;
+	  right = high;
+	  while ( left < right){
+		  while(child.get(left).getEvaluation() <= pivot_item) left++;
+		  while( child.get(right).getEvaluation() >= pivot_item) right--;
+		  if(left < right) Swap(left,right,child);
+	  }
+	  child.set(low, child.get(right));
+	  child.set(right, piv);
+	  return right;
+  }
+  
+  private void Swap(int loc1,int loc2,ArrayList<Node84118410> child){
+	  Node84118410 flag= child.get(loc1);
+	  child.set(loc1, child.get(loc2));
+	  child.set(loc2, flag);
+  }
 }
