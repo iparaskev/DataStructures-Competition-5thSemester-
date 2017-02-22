@@ -92,6 +92,11 @@ public class Player84118410 implements AbstractPlayer
 	    	Node84118410 child = new Node84118410(chBoard , parent , move , depth); //δημιουργούμε τον κάθε νέο κόμβο που αντιτοιχεί σε κάθε κίνηση
 	    	child.setOriginalBoard(pBoard);  // πινακας πριν την κινηση
 	    	double eval = child.getEvaluation();
+		
+		if((eval+score) >= 500){
+	    		parent.setA(Double.MAX_VALUE);
+	    		break;
+	    	}
 	    	
 	    	if(depth>1){ //αν μπηκε σε επομενη κινηση επειδη την καει δικια μας κινηση θα ειναι αθροισμα
 	    		eval+=parent.getEvaluation();
@@ -144,6 +149,7 @@ public class Player84118410 implements AbstractPlayer
     	    	//if oppenent's score becomes more than 500 
     	    	if((child.getEvaluation() + CrushUtilities.getOpponentsScore(id)) >= 500){
               	  parent.setB(Double.MIN_VALUE);
+              	  break;
                 }
     	    	child.setEvaluation(eval);   //set evaluation for opps
     	    	child.setOriginalBoard(board); //πινακας πριν την κινηση
@@ -194,6 +200,10 @@ public class Player84118410 implements AbstractPlayer
               Board nodeBoard = CrushUtilities.boardAfterFirstMove(myBoard, move); // o pinakas meta thn kinish   
               Node84118410 child = new Node84118410(nodeBoard, parent, move, depth);
               double eval = child.getEvaluation() + parent.getEvaluation(); // score after move;
+	      if(child.getEvaluation()+parent.getParent().getEvaluation()+score >= 500){
+            	  parent.setA(Double.MAX_VALUE);
+            	  break;
+              }
               child.setEvaluation(eval);
               child.setOriginalBoard(myBoard);
               parent.setChildren(child);
@@ -229,8 +239,9 @@ public class Player84118410 implements AbstractPlayer
               Node84118410 child = new Node84118410(nodeBoard, parent, move, depth);
               double eval = parent.getEvaluation() - child.getEvaluation(); // score after move;
               //if oppenent's score becomes more than 500 
-              if((child.getEvaluation() + CrushUtilities.getOpponentsScore(id)) >= 500){
+              if((child.getEvaluation() + parent.getParent().getEvaluation() + CrushUtilities.getOpponentsScore(id)) >= 500){
             	  parent.setB(Double.MIN_VALUE);
+            	  break;
               }
               child.setEvaluation(eval);
               child.setOriginalBoard(last);
