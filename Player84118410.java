@@ -94,7 +94,7 @@ public class Player84118410 implements AbstractPlayer
 	    	double eval = child.getEvaluation();
 		
 		if((eval+score) >= 500){
-	    		parent.setA(Double.MAX_VALUE);
+	    		child.setB(Double.MAX_VALUE);
 	    		break;
 	    	}
 	    	
@@ -145,12 +145,13 @@ public class Player84118410 implements AbstractPlayer
     			int move[] = moves.get(i);	//η κάθε κίνηση
     	    	Board boardOfNode = CrushUtilities.boardAfterFirstMove(board, move);	// ο πίνακας μετά την κίνηση
         		Node84118410 child = new Node84118410(boardOfNode , parent , move , depth);  	//ο κόμβος της κάθε κίνησης
-    	    	double eval = parent.getEvaluation()-child.getEvaluation(); //adjustments
     	    	//if oppenent's score becomes more than 500 
     	    	if((child.getEvaluation() + CrushUtilities.getOpponentsScore(id)) >= 500){
               	  parent.setB(Double.MIN_VALUE);
               	  break;
                 }
+		double eval = parent.getEvaluation()-child.getEvaluation(); //adjustments
+    	    
     	    	child.setEvaluation(eval);   //set evaluation for opps
     	    	child.setOriginalBoard(board); //πινακας πριν την κινηση
         		parent.setChildren(child);//ορίζουμε κάθε κίνηση του αντιπάλου σαν παιδί της αντίστοιχης δική μας κίνησης 	
@@ -199,11 +200,11 @@ public class Player84118410 implements AbstractPlayer
               int[] move = posMoves.get(i); //h kinish
               Board nodeBoard = CrushUtilities.boardAfterFirstMove(myBoard, move); // o pinakas meta thn kinish   
               Node84118410 child = new Node84118410(nodeBoard, parent, move, depth);
-              double eval = child.getEvaluation() + parent.getEvaluation(); // score after move;
-	      if(child.getEvaluation()+parent.getParent().getEvaluation()+score >= 500){
-            	  parent.setA(Double.MAX_VALUE);
+               if(child.getEvaluation()+parent.getParent().getEvaluation()+score >= 500){
+            	  child.setB(Double.MAX_VALUE);
             	  break;
               }
+	      double eval = child.getEvaluation() + parent.getEvaluation(); // score after move;
               child.setEvaluation(eval);
               child.setOriginalBoard(myBoard);
               parent.setChildren(child);
@@ -237,12 +238,13 @@ public class Player84118410 implements AbstractPlayer
         	  int[] move = posMoves.get(i); //h kinish
               Board nodeBoard = CrushUtilities.boardAfterFirstMove(last, move); // o pinakas meta thn kinish
               Node84118410 child = new Node84118410(nodeBoard, parent, move, depth);
-              double eval = parent.getEvaluation() - child.getEvaluation(); // score after move;
               //if oppenent's score becomes more than 500 
-              if((child.getEvaluation() + parent.getParent().getEvaluation() + CrushUtilities.getOpponentsScore(id)) >= 500){
+              if((child.getEvaluation() +CrushUtilities.getOpponentsScore(id)) >= 500){
             	  parent.setB(Double.MIN_VALUE);
             	  break;
               }
+	      double eval = parent.getEvaluation() - child.getEvaluation(); // score after move;
+           
               child.setEvaluation(eval);
               child.setOriginalBoard(last);
             
