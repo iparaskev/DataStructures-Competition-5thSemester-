@@ -315,4 +315,33 @@ public class Player84118410 implements AbstractPlayer
 	  child.set(loc1, child.get(loc2));
 	  child.set(loc2, flag);
   }
+  
+    int partitionDes (ArrayList<Node84118410> a, int low,int high){
+	  int left,right;
+	  Node84118410 pivot_item=a.get(low).getChildren().get(0);
+	  int pivot=left=low;
+	  right=high;
+	  while(left<right){
+		  while( a.get(left).getChildren().get(0).getEvaluation() >= pivot_item.getEvaluation()) left++;
+		  while( a.get(right).getChildren().get(0).getEvaluation() <= pivot_item.getEvaluation()) right--;
+		  if(left<right) {
+			  Node84118410 temp = a.get(left);
+			  a.set(left, a.get(right));
+			  a.set(right, temp);
+		  }
+	  }
+	  a.set(low, a.get(right));
+	  a.set(right, pivot_item);
+	  return right;
+  }
+  
+  ArrayList<Node84118410> quicksortD(ArrayList<Node84118410> a, int low , int high){
+	  int pivot;
+	  if(high>low){
+		  pivot = partitionDes(a , low , high);
+		  quicksortD(a,low,pivot-1);
+		  quicksortD(a,pivot+1,high);
+	  }
+	  return a;
+  }
 }
